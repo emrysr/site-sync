@@ -46,7 +46,7 @@ I've put the values into settings.conf to save me having to read the DB size eve
 ---
 ## #REQUIRED
 <pre>
-commands used:    ssh,pv,mysqldump,printf,zcat and rsync
+commands used:    ssh,pv,mysql,mysqldump,printf,zcat and rsync
 ssh config:       The variable SSH needs to match a section of ssh config to
                   to to enable rsync to connect without prompting.
 rsync defaults:   Does not delete files
