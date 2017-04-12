@@ -1,0 +1,65 @@
+#!/bin/bash
+#import settings
+source settings.conf
+
+### change this for different syncs ###
+SOURCE="TEST"
+DESTINATION="DEV"
+
+
+## these will change for each sync type
+DB_SRC_CONF=${SOURCE}_MYSQL_CONF
+DB_SRC=${SOURCE}_DB_NAME
+DB_DEST_CONF=${DESTINATION}_MYSQL_CONF
+DB_DEST=${DESTINATION}_DB_NAME
+
+SSH=${DESTINATION}_SSH
+
+DB_SRC_BACKUP=src_backup.sql.gz
+DB_DEST_BACKUP=dest_backup.sql.gz
+
+BASE_DEST=${DESTINATION}_PATH
+BASE_SRC=${SOURCE}_PATH
+
+
+#confirmation warning message
+printf "${Red}"
+read -r -p "Are you sure you want to overwrite ${!DB_DEST} ? [y/N] ..." response
+response=${response,,}    # tolower
+if [[ "$response" =~ ^(yes|y)$ ]]
+then
+#warning ok
+
+#backup destination database
+  #printf "${ColourOff}\n"
+  printf "${Green}Backing up ${DESTINATION} database...${ColourOff}\n"
+  mysqldump --defaults-file=${!DB_DEST_CONF} ${!DB_DEST} | gzip | pv --size $SIZE_COMPRESSED > $DB_DEST_BACKUP
+  echo Backup done
+
+#backup source database
+  #printf $HR
+  printf "${Green}Backing up ${SOURCE} database...${ColourOff}\n"
+  mysqldump --defaults-file=${!DB_SRC_CONF} ${!DB_SRC}  |  gzip | pv --size $SIZE_COMPRESSED > $DB_SRC_BACKUP
+  echo Backup done
+
+#import source db into destination db
+  #printf $HR
+  printf "${Green}Importing ${SOURCE} mysqldump...${ColourOff}\n"
+  zcat $DB_SRC_BACKUP | pv --size $SIZE | mysql --defaults-file=${!DB_DEST_CONF} ${!DB_DEST}
+  echo Import done
+
+ #loop through all the directories set in include file
+  printf $HR
+  printf "${Green}Syncing files changed in ${SOURCE} to ${DESTINATION}"
+  printf "${Yellow} ${i}...${ColourOff}\n"
+  rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${!SSH}:${!BASE_SRC}/ ${!BASE_DEST}/
+  echo Files transfered
+
+#done message
+  printf "${Yellow}\n  DONE :)   "
+  printf "${ColourOff}${DESTINATION} synced with ${SOURCE}\n\n"
+
+else
+#warning cancelled
+echo ABORTED!
+fi

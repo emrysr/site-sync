@@ -1,0 +1,6 @@
+[client]
+host=testserver.domain.com
+user=testdbuser
+password=password
+[mysql]
+database=testdatabase
