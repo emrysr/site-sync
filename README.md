@@ -10,19 +10,6 @@ destination system from source system
 > This will overwrite databases and files. you will loose work if you're not careful.
 > Take backups before using my shonky code please!!
 
-## Install (example files below)
-1. Clone this repo
-2. Create an entry in your ~/.ssh/config file to handle the SSH connection. *Ensure your public key is on the server*
-3. Save you mysql connection settings in a .cnf style file 
-4. Save the settings.sample.conf as settings.conf
-5. Edit the settings.conf file to match your settings
-6. BACKUP FIRST!!!
-7. Run the desired script. eg. ./STAGING-to-DEV
-8. Press Y to continue or N to cancel
-9. Wait for "Done" message.
-
-
-
 ## Three bash scripts:
 Run any of these to sync the way described. 
 - STAGING-to-DEV - overwrites dev with staging
@@ -30,6 +17,19 @@ Run any of these to sync the way described.
 - DEV-to-PRODUCTION - overwrites production with dev
 ### Additional syncs
 Create a copy of any of the above scrpts and change the SOURCE and DESTINATION variables to match corresponding environment in the settings.conf file.
+
+
+## Install (example files below)
+1. Clone this repo
+2. Create an entry in your ~/.ssh/config file to handle the SSH connection. *Ensure your public key is on the server*
+3. Save you mysql connection settings in a .cnf style file 
+4. Save the settings.sample.conf as settings.conf
+5. Edit the settings.conf file to match your settings
+6. **BACKUP FIRST!!!**
+7. Run the desired script. eg. ./STAGING-to-DEV
+8. Press Y to continue or N to cancel
+9. Wait for "Done" message.
+
 
 ## config
 settings.conf - file paths for the 3 environments and mysql.cnf
