@@ -16,7 +16,7 @@ Run any of these to sync the way described.
 - DEV-to-STAGING - overwrites staging with dev
 - DEV-to-PRODUCTION - overwrites production with dev
 ### Additional syncs
-Create a copy of any of the above scrpts and change the SOURCE and DESTINATION variables to match corresponding environment in the settings.conf file.
+Create a copy of any of the above scrpts and change the SOURCE and DESTINATION variables to match corresponding environment in the settings.conf file. Copy *-DEV to download or copy DEV-* to upload.
 
 
 ## Install (example files below)
