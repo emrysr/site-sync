@@ -81,7 +81,7 @@ password=root
 database=devirataorg
 ```
 
-*includes.list:*
+*settings.conf (for one ENV):*
 ```bash
 DEV_MYSQL_CONF=dev.mysql.cnf
 DEV_DB_NAME="devdb"
