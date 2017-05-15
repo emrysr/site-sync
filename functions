@@ -9,19 +9,22 @@ syncSystems() {
 	response=${response,,}    # tolower
 	if [[ "$response" =~ ^(yes|y)$ ]]
 	then
+	#mode 1 = all
+	#mode 2 = files only
+	#mode 3 = db only
 	  #warning ok
 		text_reset
 	  #debug messages
 		startingMessage
 		printVariables
 	  #backup destination database
-		backupDestinationDatabase
+		if [ $MODE -ne 2 ] ; then backupDestinationDatabase; fi
 	  #backup source database
-		backupSourceDatabase
+		if [ $MODE -ne 2 ] ; then backupSourceDatabase; fi
 	  #import source db into destination db
-		importSourceDatabase
+	  	if [ $MODE -ne 2 ] ; then importSourceDatabase; fi
 	  #loop through all the directories set in include file
-		syncAllItems
+		if [ $MODE -ne 3 ] ; then syncAllItems; fi
 	  #done message
 		finishedMessage
 	else
@@ -37,14 +40,41 @@ syncAllItems () {
   text_yellow
   echo "${i}..."
   text_reset
+  if [ "${!SSH_SRC_NAME}" != "" ] ; then SSH_SRC=${!SSH_SRC_NAME}\:; fi
+  if [ "${!SSH_DEST_NAME}" != "" ] ; then	SSH_DEST=${!SSH_DEST_NAME}\:; fi
   if [ "$DEBUG" = true ] ; then
 	debugNotice
-    echo "rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${!BASE_SRC}/ ${!SSH}:${!BASE_DEST}/"
+    echo "rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${SSH_DEST}${!BASE_DEST}/"
     text_reset
   else
-    rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${!BASE_SRC}/ ${!SSH}:${!BASE_DEST}/
+    rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${!SSH_DEST}${!BASE_DEST}/
     echo Files transfered
   fi
+}
+
+createVariables () {
+	## these will change for each sync type
+	DB_SRC_CONF=${SOURCE}_MYSQL_CONF
+	DB_SRC=${SOURCE}_DB_NAME
+	DB_DEST_CONF=${DESTINATION}_MYSQL_CONF
+	DB_DEST=${DESTINATION}_DB_NAME
+
+	#flip rsync from upload to download
+	if [ $SOURCE = "DEV" ] ; then 
+	  SSH_SRC_NAME=""
+	  SSH_DEST_NAME=${DESTINATION}_SSH
+	else
+	  SSH_SRC_NAME=${SOURCE}_SSH
+	  SSH_DEST_NAME=""
+	fi
+
+	#backup locations
+	DB_SRC_BACKUP=src_backup.sql.gz
+	DB_DEST_BACKUP=dest_backup.sql.gz
+
+	#base paths
+	BASE_DEST=${DESTINATION}_PATH
+	BASE_SRC=${SOURCE}_PATH
 }
 
 backupDestinationDatabase () {
@@ -106,7 +136,7 @@ finishedMessage () {
 startingMessage () {
 	if [ "$DEBUG" = true ] ; then
 		separator
-		echo "START DEGUG"
+		echo "START DEBUG"
 		separator
 	fi
 }
@@ -115,6 +145,7 @@ printVariables () {
 	if [ $DEBUG ] ; then
 	    echo "VARIABLES:"
 	    echo "-------------"
+	    echo "MODE = $MODE"
 		echo "SOURCE = $SOURCE"
 		echo "DESTINATION = $DESTINATION"
 		echo ""
@@ -122,7 +153,8 @@ printVariables () {
 	    echo "DB_SRC = ${!DB_SRC}"
 	    echo "DB_DEST_CONF = ${!DB_DEST_CONF}"
 	    echo "DB_DEST = ${!DB_DEST}"
-	    echo "SSH = ${!SSH}"
+	    echo "SSH_SRC_NAME = ${!SSH_SRC_NAME}"
+	    echo "SSH_DEST_NAME = ${!SSH_DEST_NAME}"
 	    echo "DB_SRC_BACKUP = $DB_SRC_BACKUP"
 	    echo "DB_DEST_BACKUP = $DB_DEST_BACKUP"
 	    echo "BASE_DEST = ${!BASE_DEST}"
@@ -133,6 +165,7 @@ printVariables () {
 	    echo ""
   	fi
 }
+
 debugNotice () {
 	echo "-- IN DEBUG MODE -- the following will be executed:"
 	text_yellow
@@ -144,4 +177,36 @@ separator () { printf $HR; }
 text_reset () { printf "${ColourOff}"; }
 text_red () { printf "${Red}"; }
 text_green () { printf "${Green}"; }
-text_yellow () { printf "${Yellow}"; }
+text_yellow () { 
+	printf "${Yellow}" 
+	[ "$#" -gt 0 ] && echo "$@"; text_reset
+}
+text_bold () { 
+	printf "${BWhite}" 
+	[ "$#" -gt 0 ] && echo "$@"; text_reset
+}
+
+
+print_usage () {
+	echo ""
+	text_bold "NAME"
+	echo "$TAB DEV-to-STAGING - sync staging server with dev using rsync"
+	echo "$TAB STAGING-to-DEV - sync dev server with staging using rsync"
+	echo "$TAB DEV-to-PRODUCTION - sync live server with dev using rsync"
+	text_bold "SYNOPSIS"
+	echo "$TAB At last... a sync script! v1"
+	text_bold "DESCRIPTION"
+	echo "$TAB Sync $SOURCE to $DESTINATION"
+	echo "$TAB read README.md for config file settings"
+	echo "$TAB -d, --db-only       only sync databases"
+	echo "$TAB -f, --files-only    only sync files"
+	echo "$TAB -h, -?, --help      show this help"
+	echo ""
+	text_bold "EXAMPLE USAGE:"
+	echo "$TAB ./DEV-to-STAGING -d   sync db from local to staging version"
+	echo "$TAB ./STAGING-to-DEV -f   sync files from staging to local"
+	echo ""
+	echo "for more help see: "
+	text_bold "https://github.com/emrysr/sync"
+	echo "emrys@matrix10.net 2017-05-15";
+}

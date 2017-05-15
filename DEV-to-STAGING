@@ -1,4 +1,5 @@
 #!/bin/bash
+DEBUG=true
 #import settings
 source settings.conf
 
@@ -6,20 +7,8 @@ source settings.conf
 SOURCE="DEV"
 DESTINATION="TEST"
 
-
-## these will change for each sync type
-DB_SRC_CONF=${SOURCE}_MYSQL_CONF
-DB_SRC=${SOURCE}_DB_NAME
-DB_DEST_CONF=${DESTINATION}_MYSQL_CONF
-DB_DEST=${DESTINATION}_DB_NAME
-
-SSH=${DESTINATION}_SSH
-
-DB_SRC_BACKUP=src_backup.sql.gz
-DB_DEST_BACKUP=dest_backup.sql.gz
-
-BASE_DEST=${DESTINATION}_PATH
-BASE_SRC=${SOURCE}_PATH
+#build the relevant variables for this sync
+createVariables
 
 ##meat and bones of this script
 syncSystems
