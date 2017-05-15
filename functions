@@ -1,26 +1,141 @@
 #!/bin/bash
 # FUNCTIONS FOR SYNC
-printVariables () 
-{
-	if [ $DEBUG ] ; then
+
+##the main script
+syncSystems() {
+  #confirmation warning message
+	text_red
+	read -r -p "Are you sure you want to overwrite ${!DB_DEST} ? [y/N] ..." response
+	response=${response,,}    # tolower
+	if [[ "$response" =~ ^(yes|y)$ ]]
+	then
+	  #warning ok
+		text_reset
+	  #debug messages
+		startingMessage
+		printVariables
+	  #backup destination database
+		backupDestinationDatabase
+	  #backup source database
+		backupSourceDatabase
+	  #import source db into destination db
+		importSourceDatabase
+	  #loop through all the directories set in include file
+		syncAllItems
+	  #done message
+		finishedMessage
+	else
+  #warning message - cancelled
+	echo ABORTED!
+	fi
+}
+
+##rsync all locations in includes.list
+syncAllItems () {
+  text_green 
+  echo "Syncing files changed in ${SOURCE} to ${DESTINATION}"
+  text_yellow
+  echo "${i}..."
+  text_reset
+  if [ "$DEBUG" = true ] ; then
+	debugNotice
+    echo "rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${!BASE_SRC}/ ${!SSH}:${!BASE_DEST}/"
+    text_reset
+  else
+    rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${!BASE_SRC}/ ${!SSH}:${!BASE_DEST}/
+    echo Files transfered
+  fi
+}
+
+backupDestinationDatabase () {
+	text_green
+	echo "Backing up ${DESTINATION} database..."
+	text_reset
+	if [ "$DEBUG" = true ] ; then
+		debugNotice
+		echo "mysqldump --defaults-file=${!DB_DEST_CONF} ${!DB_DEST} | gzip | pv --size $SIZE_COMPRESSED > $DB_DEST_BACKUP"
+    	text_reset
+	else
+		mysqldump --defaults-file=${!DB_DEST_CONF} ${!DB_DEST} | gzip | pv --size $SIZE_COMPRESSED > $DB_DEST_BACKUP
+		echo Backup done
+	fi
+}
+backupSourceDatabase () {
+	#separator
+	text_green
+	echo "Backing up ${SOURCE} database..."
+	text_reset
+	if [ "$DEBUG" = true ] ; then
+		debugNotice
+		echo "mysqldump --defaults-file=${!DB_SRC_CONF} ${!DB_SRC}  |  gzip | pv --size $SIZE_COMPRESSED > $DB_SRC_BACKUP"
+    	text_reset
+	else
+		mysqldump --defaults-file=${!DB_SRC_CONF} ${!DB_SRC}  |  gzip | pv --size $SIZE_COMPRESSED > $DB_SRC_BACKUP
+		echo Backup done
+	fi
+}
+importSourceDatabase () {
+	#separator
+	text_green
+	echo "Importing ${SOURCE} mysqldump..."
+	text_reset
+	if [ "$DEBUG" = true ] ; then
+		debugNotice
+		echo "zcat $DB_SRC_BACKUP | pv --size $SIZE | mysql --defaults-file=${!DB_DEST_CONF} ${!DB_DEST}"
+    	text_reset
+	else
+		zcat $DB_SRC_BACKUP | pv --size $SIZE | mysql --defaults-file=${!DB_DEST_CONF} ${!DB_DEST}
+		echo Import done
+	fi
+}
+
+finishedMessage () {
+	text_yellow
+	echo ""
+	echo "DONE :)"
+	echo ""
+	text_reset
+	echo "${DESTINATION} synced with ${SOURCE}"
+	echo ""
+	if [ "$DEBUG" = true ] ; then
 		separator
-	    echo "START DEGUG"
-	    separator
+		echo "END DEBUG"
+		separator
+	fi
+}
+startingMessage () {
+	if [ "$DEBUG" = true ] ; then
+		separator
+		echo "START DEGUG"
+		separator
+	fi
+}
+
+printVariables () {
+	if [ $DEBUG ] ; then
 	    echo "VARIABLES:"
 	    echo "-------------"
 		echo "SOURCE = $SOURCE"
 		echo "DESTINATION = $DESTINATION"
-		echo "-------------"
+		echo ""
 	    echo "DB_SRC_CONF = ${!DB_SRC_CONF}"
 	    echo "DB_SRC = ${!DB_SRC}"
 	    echo "DB_DEST_CONF = ${!DB_DEST_CONF}"
 	    echo "DB_DEST = ${!DB_DEST}"
 	    echo "SSH = ${!SSH}"
-	    echo "DB_SRC_BACKUP = ${!DB_SRC_BACKUP}"
-	    echo "DB_DEST_BACKUP = ${!DB_DEST_BACKUP}"
+	    echo "DB_SRC_BACKUP = $DB_SRC_BACKUP"
+	    echo "DB_DEST_BACKUP = $DB_DEST_BACKUP"
 	    echo "BASE_DEST = ${!BASE_DEST}"
 	    echo "BASE_SRC = ${!BASE_SRC}"
+	    echo ""
+	    echo "SIZE = $SIZE"
+	    echo "SIZE_COMPRESSED = $SIZE_COMPRESSED"
+	    echo ""
   	fi
+}
+debugNotice () {
+	echo "-- IN DEBUG MODE -- the following will be executed:"
+	text_yellow
 }
 
 separator () { printf $HR; }
@@ -29,3 +144,4 @@ separator () { printf $HR; }
 text_reset () { printf "${ColourOff}"; }
 text_red () { printf "${Red}"; }
 text_green () { printf "${Green}"; }
+text_yellow () { printf "${Yellow}"; }
