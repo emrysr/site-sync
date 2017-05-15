@@ -19,6 +19,12 @@ Run any of these to sync the way described.
 Create a copy of any of the above scrpts and change the SOURCE and DESTINATION variables to match corresponding environment in the settings.conf file. Copy *-DEV to download or copy DEV-* to upload.
 
 
+## MODES
+use -d, --db-only to only sync databases
+use -f, --files-only to only sync files
+use -h, --help to see help
+
+
 ## Install (example files below)
 1. Clone this repo
 2. Create an entry in your ~/.ssh/config file to handle the SSH connection. *Ensure your public key is on the server*
