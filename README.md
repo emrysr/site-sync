@@ -20,9 +20,9 @@ Create a copy of any of the above scrpts and change the SOURCE and DESTINATION v
 
 
 ## MODES
-use -d, --db-only to only sync databases
-use -f, --files-only to only sync files
-use -h, --help to see help
+- use -d, --db-only to only sync databases
+- use -f, --files-only to only sync files
+- use -h, --help to see help
 
 
 ## Install (example files below)
