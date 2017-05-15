@@ -1,0 +1,31 @@
+#!/bin/bash
+# FUNCTIONS FOR SYNC
+printVariables () 
+{
+	if [ $DEBUG ] ; then
+		separator
+	    echo "START DEGUG"
+	    separator
+	    echo "VARIABLES:"
+	    echo "-------------"
+		echo "SOURCE = $SOURCE"
+		echo "DESTINATION = $DESTINATION"
+		echo "-------------"
+	    echo "DB_SRC_CONF = ${!DB_SRC_CONF}"
+	    echo "DB_SRC = ${!DB_SRC}"
+	    echo "DB_DEST_CONF = ${!DB_DEST_CONF}"
+	    echo "DB_DEST = ${!DB_DEST}"
+	    echo "SSH = ${!SSH}"
+	    echo "DB_SRC_BACKUP = ${!DB_SRC_BACKUP}"
+	    echo "DB_DEST_BACKUP = ${!DB_DEST_BACKUP}"
+	    echo "BASE_DEST = ${!BASE_DEST}"
+	    echo "BASE_SRC = ${!BASE_SRC}"
+  	fi
+}
+
+separator () { printf $HR; }
+
+
+text_reset () { printf "${ColourOff}"; }
+text_red () { printf "${Red}"; }
+text_green () { printf "${Green}"; }
