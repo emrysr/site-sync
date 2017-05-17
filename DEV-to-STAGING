@@ -1,5 +1,8 @@
 #!/bin/bash
-DEBUG=true
+
+# UNCOMMENT THIS TO SEE SETTINGS AND NOT RUN CODE
+DEBUG=false
+
 #import settings
 source settings.conf
 

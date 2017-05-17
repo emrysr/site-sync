@@ -41,13 +41,14 @@ syncAllItems () {
   echo "${i}..."
   text_reset
   if [ "${!SSH_SRC_NAME}" != "" ] ; then SSH_SRC=${!SSH_SRC_NAME}\:; fi
-  if [ "${!SSH_DEST_NAME}" != "" ] ; then	SSH_DEST=${!SSH_DEST_NAME}\:; fi
+  if [ "${!SSH_DEST_NAME}" != "" ] ; then SSH_DEST=${!SSH_DEST_NAME}\:; fi
   if [ "$DEBUG" = true ] ; then
 	debugNotice
-    echo "rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${SSH_DEST}${!BASE_DEST}/"
+    echo "rsync -azi --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${SSH_DEST}${!BASE_DEST}/"
     text_reset
   else
-    rsync -az --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${!SSH_DEST}${!BASE_DEST}/
+    #rsync -azi --info=progress2 --recursive --exclude-from=excludes.list --files-from=includes.list /vagrant/ irata-test:/var/www/clients/client4/web10/
+    rsync -azi --info=progress2 --recursive --exclude-from=${EXCLUDES} --files-from=${INCLUDES} ${SSH_SRC}${!BASE_SRC}/ ${SSH_DEST}${!BASE_DEST}/
     echo Files transfered
   fi
 }
@@ -142,7 +143,7 @@ startingMessage () {
 }
 
 printVariables () {
-	if [ $DEBUG ] ; then
+	if [ "$DEBUG" = true ] ; then
 	    echo "VARIABLES:"
 	    echo "-------------"
 	    echo "MODE = $MODE"
