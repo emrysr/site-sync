@@ -4,7 +4,8 @@
 DEBUG=true
 
 #import settings
-source settings.conf
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/settings.conf
 
 ### change this for different syncs ###
 SOURCE="TEST"

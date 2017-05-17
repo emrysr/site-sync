@@ -28,7 +28,7 @@ Create a copy of any of the above scrpts and change the SOURCE and DESTINATION v
 ## Install (example files below)
 1. Clone this repo
 2. Create an entry in your ~/.ssh/config file to handle the SSH connection. *Ensure your public key is on the server*
-3. Save you mysql connection settings in a .cnf style file 
+3. Save you mysql connection settings in a .cnf style file *(must be 644 to stop mysql warnings)*
 4. Save the settings.sample.conf as settings.conf
 5. Edit the settings.conf file to match your settings
 6. **BACKUP FIRST!!!**
