@@ -4,6 +4,7 @@
 ##the main script
 syncSystems() {
   #confirmation warning message
+    startingMessage
 	text_red
 	read -r -p "Are you sure you want to overwrite ${!DB_DEST} ? [y/N] ..." response
 	response=${response,,}    # tolower
@@ -15,7 +16,6 @@ syncSystems() {
 	  #warning ok
 		text_reset
 	  #debug messages
-		startingMessage
 		printVariables
 	  #backup destination database
 		if [ $MODE -ne 2 ] ; then backupDestinationDatabase; fi
@@ -68,10 +68,6 @@ createVariables () {
 	  SSH_SRC_NAME=${SOURCE}_SSH
 	  SSH_DEST_NAME=""
 	fi
-
-	#backup locations
-	DB_SRC_BACKUP=src_backup.sql.gz
-	DB_DEST_BACKUP=dest_backup.sql.gz
 
 	#base paths
 	BASE_DEST=${DESTINATION}_PATH
@@ -146,6 +142,7 @@ printVariables () {
 	if [ "$DEBUG" = true ] ; then
 	    echo "VARIABLES:"
 	    echo "-------------"
+	    echo "DIR = $DIR"
 	    echo "MODE = $MODE"
 		echo "SOURCE = $SOURCE"
 		echo "DESTINATION = $DESTINATION"
