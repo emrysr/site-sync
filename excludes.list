@@ -1,2 +1,4 @@
-tmp/emrys/online-only
+private/sync/src_backup.sql.gz
+private/sync/dest_backup.sql.gz
+
 
