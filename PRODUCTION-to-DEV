@@ -8,8 +8,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $DIR/settings.conf
 
 ### change this for different syncs ###
-SOURCE="DEV"
-DESTINATION="PRODUCTION"
+SOURCE="PRODUCTION"
+DESTINATION="DEV"
 
 #build the relevant variables for this sync
 createVariables
