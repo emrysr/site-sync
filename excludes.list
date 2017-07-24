@@ -1,4 +1,4 @@
 tmp/emrys/online-only
 web/stats
-
-
+private/sync/src_backup.sql.gz
+private/sync/dest_backup.sql.gz
