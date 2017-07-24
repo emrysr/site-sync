@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# UNCOMMENT THIS TO SEE SETTINGS AND NOT RUN CODE
+DEBUG=false
+
+#import settings
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/settings.conf
+
+### change this for different syncs ###
+SOURCE="PRODUCTION"
+DESTINATION="DEV"
+
+#build the relevant variables for this sync
+createVariables
+
+##meat and bones of this script
+syncSystems
